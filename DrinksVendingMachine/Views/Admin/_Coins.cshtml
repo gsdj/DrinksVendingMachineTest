@@ -1,0 +1,44 @@
+﻿@using DrinksVendingMachine.Models.DbModels;
+@model List<Coin>
+
+<table class="table table-sm table-hover text-center">
+    <thead class="thead-light">
+        <tr>
+            <th>Номинал</th>
+            <th>Колличество</th>
+            <th>Сумма</th>
+            <th>Доступность</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Coin item in Model)
+        {
+            <tr id="@item.Id" onclick="">
+                <td>@item.CoinDenomination</td>
+                <td>@item.Count</td>
+                <td>@item.SumCoins</td>
+                <td>
+                    <div class="custom-control custom-switch">
+                        @if (item.IsBlocked == 0)
+                        {
+                            <input type="checkbox" class="custom-control-input" id="coinSwitch_@item.Id" onchange="blockCoin(@item.Id,this)">
+                            <label class="custom-control-label" for="coinSwitch_@item.Id" id="coinLabel_@item.Id">Разрешен</label>
+                        }
+                        else
+                        {
+                            <input type="checkbox" class="custom-control-input" id="coinSwitch_@item.Id" checked onchange="blockCoin(@item.Id,this)">
+                            <label class="custom-control-label" for="coinSwitch_@item.Id" id="coinLabel_@item.Id">Заблокирован</label>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+    <thead class="thead-light">
+        <tr>
+            <th colspan="2" style="text-align:right;">Сумма всех монет:</th>
+            <th>@Model.Sum(p => p.SumCoins)</th>
+            <th></th>
+        </tr>
+    </thead>
+</table>

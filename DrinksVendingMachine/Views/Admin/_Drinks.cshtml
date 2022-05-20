@@ -1,0 +1,53 @@
+﻿@using DrinksVendingMachine.Models.DbModels;
+@model List<Drink>
+<button type="button" class="btn btn-light" onclick="GetGroups(@Model.FirstOrDefault().DrinkGroup.DrinkTypeId)">< Назад</button>
+<button type="button" class="btn btn-info" onclick="CreateDrink(@Model.FirstOrDefault().DrinkGroupId, '@Model.FirstOrDefault().DrinkGroup.Name')">Добавить напиток</button>
+<br />
+<h3>@Model.FirstOrDefault().DrinkGroup.DrinkType.Name - @Model.FirstOrDefault().DrinkGroup.Name</h3>
+<table id="drinksTable" class="table table-sm table-hover">
+    <thead class="thead-light">
+        <tr>
+            <th scope="col">Наименование</th>
+            <th scope="col">Описание</th>
+            <th scope="col">Объем</th>
+            <th scope="col">Цена</th>
+            <th scope="col">Кол-во</th>
+            <th scope="col">Изображение</th>
+            <th scope="col" style="width:240px">Доступность</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Drink item in Model)
+        {
+            <tr id="@item.Id">
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>@item.Volume</td>
+                <td>@item.Price</td>
+                <td>@item.Count</td>
+                <td>
+                    <img src="@item.ImageUrl" style="width: 50px; height: 50px;" class="rounded" alt="None">
+                </td>
+                <td>
+                    <div class="custom-control custom-switch">
+                        @if (item.IsBlocked == 0)
+                        {
+                            <input type="checkbox" class="custom-control-input" id="drinkSwitch_@item.Id" onchange="blockDrink(@item.Id,this)">
+                            <label class="custom-control-label" for="drinkSwitch_@item.Id" id="drinkLabel_@item.Id">Разрешен</label>
+                        }
+                        else
+                        {
+                            <input type="checkbox" class="custom-control-input" id="drinkSwitch_@item.Id" checked onchange="blockDrink(@item.Id,this)">
+                            <label class="custom-control-label" for="drinkSwitch_@item.Id" id="drinkLabel_@item.Id">Заблокирован</label>
+                        }
+                    </div>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-light" onclick="DeleteDrink(@item.Id,@item.DrinkGroupId)">Удалить</a>
+                    <a href="#" class="btn btn-light" onclick="EditDrink(@item.Id)">Изменить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

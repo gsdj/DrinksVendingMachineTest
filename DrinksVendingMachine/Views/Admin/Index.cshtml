@@ -1,0 +1,110 @@
+﻿@using DrinksVendingMachine.Models.DbModels;
+@model List<DrinkType>
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="container-fluid">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Напитки</a>
+            <div class="dropdown-menu">
+                @foreach (DrinkType item in Model)
+                {
+                    <a class="dropdown-item" href="#drinks_tab" data-toggle="tab" onclick="GetGroups(@item.Id)">@item.Name</a>
+                }
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#drinks_tab" onclick="AddType()">Добавить тип напитка</a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#coins_tab" onclick="GetCoins()">Монеты</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#image_tab" onclick="AddImage()">Добавить изображение</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="drinks_tab" class="container-fluid tab-pane pt-3 active">
+            <div id="drinks"></div>
+        </div>
+        <div id="coins_tab" class="container tab-pane fade text-center">
+            <br>
+            <h3>Монеты</h3>
+            <div id="coins"></div>
+        </div>
+        <div id="image_tab" class="container-fluid tab-pane fade text-center">
+            <br>
+            <h3>Изображения</h3>
+            <div id="images"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function AddType() {
+        $('#drinks').load('@Url.Action("AddType", "Admin")');
+    }
+    function AddGroup() {
+        $('#drinks').load('@Url.Action("AddGroup", "Admin")');
+    }
+    function DeleteGroup(id) {
+        $.get('@Url.Action("DeleteGroup", "Admin")?id=' + id, function myfunction(data) {
+            $('#drinks').html(data);
+        });
+    }
+    function GetCoins() {
+        $('#coins').load('@Url.Action("Coins", "Admin")');
+    }
+    function AddImage() {
+        $('#images').load('@Url.Action("Images", "Admin")');
+    }
+    function GetGroups(id) {
+        $('#drinks').load('@Url.Action("Groups", "Admin")?id=' + id);
+    };
+    function GetDrinks(id) {
+        $('#drinks').load('@Url.Action("Drinks", "Admin")?id=' + id);
+    };
+    function EditDrink(id) {
+        $.get('@Url.Action("Drink", "Admin")?id=' + id)
+            .done(function (data) {
+                $('#drinks').html(data);
+                document.querySelector('#ImageSelect').addEventListener('change', (e) => {
+                    let imgf = document.querySelector('#imgFrmSel');
+                    imgf.src = e.target.value;
+                });
+            });
+    };
+    function CreateDrink(id,name) {
+        $('#drinks').load('@Url.Action("CreateDrink", "Admin")?GroupId=' + id + '&Name=' + name);
+    };
+
+    function blockDrink(id,e) {
+        $.get('@Url.Action("BlockDrink","Admin")?id=' + id);
+        let dlId = $('#drinkLabel_' + id)
+        if (e.checked) {
+            dlId.html('Заблокирован');
+        } else {
+            dlId.html('Разрешен');
+        }
+    };
+
+    function blockCoin(id,e) {
+        $.get('@Url.Action("BlockCoin","Admin")?id=' + id);
+        let dlId = $('#coinLabel_' + id)
+        if (e.checked) {
+            dlId.html('Заблокирован');
+        } else {
+            dlId.html('Разрешен');
+        }
+    };
+
+    function DeleteDrink(id,groupId) {
+        $.get('@Url.Action("DeleteDrink", "Admin")?id=' + id + '&groupId=' + groupId, function myfunction(data) {
+            $('#drinks').html(data);
+        });
+    };
+
+</script>
+
+

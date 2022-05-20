@@ -1,0 +1,58 @@
+﻿@using DrinksVendingMachine.Models.ViewModels;
+@model DrinkEditViewModel;
+
+@if (Model.Drink.Id > 0)
+{
+    <button type="button" class="btn btn-light" onclick="GetDrinks(@Model.Drink.DrinkGroupId)">Назад</button>
+}
+
+<div class="container editForm">
+    <form action="/Admin/SaveDrink" data-ajax="true" data-ajax-mode="replace" data-ajax-update="#drinks" id="form0" method="post">
+        <div class="d-flex flex-column ">
+            <input type="hidden" class="form-control" name="Id" value="@Model.Drink.Id" />
+            <input type="hidden" class="form-control" name="DrinkGroupId" value="@Model.Drink.DrinkGroupId" />
+
+            <div class="form-group">
+                <label for="Name">Наименование:</label>
+                <input type="text" class="form-control" name="Name" value="@Model.Drink.Name" />
+            </div>
+
+            <div class="form-group">
+                <label for="Description">Описание:</label>
+                <input type="text" class="form-control" name="Description" value="@Model.Drink.Description" />
+            </div>
+
+            <div class="form-group">
+                <label for="Volume">Объем:</label>
+                <input type="text" class="form-control" name="Volume" value="@Model.Drink.Volume" />
+            </div>
+
+            <div class="form-group">
+                <label for="Price">Цена:</label>
+                <input type="text" class="form-control" name="Price" value="@Model.Drink.Price" />
+            </div>
+
+            <div class="form-group">
+                <label for="Count">Колличество:</label>
+                <input type="text" class="form-control" name="Count" value="@Model.Drink.Count" />
+            </div>
+
+            <div class="d-flex">
+                <div class="form-group flex-grow-1">
+                    <label for="ImageUrl">Изображение:</label>
+                    <select id="ImageSelect" name="ImageUrl" class="custom-select">
+                        <option value="">None</option>
+                        @foreach (var item in Model.Images)
+                        {
+                            <option value="@item.Path">@item.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="ml-2 align-self-center">
+                    <img id="imgFrmSel" src="@Model.Drink.ImageUrl" style="width: 75px; height: 75px;" class="rounded" alt="Image">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Save</button>
+        </div>
+    </form>
+</div>

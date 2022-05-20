@@ -1,0 +1,87 @@
+﻿@using DrinksVendingMachine.Models.DbModels;
+
+@model List<DrinkGroup>
+<br>
+@if (Model.FirstOrDefault() == null)
+{
+    <div class="row">
+        <div class="col">
+            <h3>@ViewBag.typeName</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3 editForm">
+            <form action="/Admin/AddGroup" data-ajax="true" data-ajax-mode="replace" data-ajax-update="#drinks" id="form0" method="post">
+                <div class="d-flex flex-column ">
+                    <input type="hidden" class="form-control" name="DrinkTypeId" value="@ViewBag.typeId" />
+                    <div class="form-group">
+                        <label for="Name">Наименование:</label>
+                        <input type="text" class="form-control" name="Name" value="" />
+                    </div>
+                    <button type="submit" class="btn btn-success">Добавить группу</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col">
+            <h3>@Model.FirstOrDefault().DrinkType.Name</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <div class="col editForm">
+                <form action="/Admin/AddGroup" data-ajax="true" data-ajax-mode="replace" data-ajax-update="#drinks" id="form0" method="post">
+                    <div class="d-flex flex-column ">
+                        <input type="hidden" class="form-control" name="DrinkTypeId" value="@ViewBag.typeId" />
+                        <div class="form-group">
+                            <label for="Name">Наименование:</label>
+                            <input type="text" class="form-control" name="Name" value="" />
+                        </div>
+                        <button type="submit" class="btn btn-success">Добавить группу</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-9">
+            <table class="table table-sm table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Наименование</th>
+                        <th>Общее кол-во напитков</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DrinkGroup item in Model)
+                    {
+                        if (item.CountDrinks > 0)
+                        {
+                            <tr id="@item.Id" onclick="GetDrinks(@item.Id)">
+                                <td>@item.Name</td>
+                                <td>@item.CountDrinks</td>
+                                <td></td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr id="@item.Id">
+                                <td>@item.Name</td>
+                                <td>
+                                    <a href="#" class="btn btn-light" onclick="CreateDrink(@item.Id,'@item.Name')">Добавить напитки</a>
+                                </td>
+                                <td>
+                                <a href="#" class="btn btn-light" onclick="DeleteGroup(@item.Id)">Удалить группу</a>
+                                </td>
+                            </tr>
+                        }
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

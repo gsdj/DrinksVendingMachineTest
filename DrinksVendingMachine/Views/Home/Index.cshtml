@@ -1,0 +1,154 @@
+﻿@using DrinksVendingMachine.Models.ViewModels;
+@using DrinksVendingMachine.Models.DbModels;
+
+@model DrinksBuyViewModel
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="d-flex flex-column">
+                <div class="">
+                    @foreach (Coin item in Model.Coins)
+                    {
+                        if (item.IsBlocked == 0)
+                        {
+                            <button type="button" id="coin_@item.CoinDenomination" class="btn btn-outline-success btnCoin" value="@item.CoinDenomination">@item.CoinDenomination</button>
+                        }
+                        else
+                        {
+                            <button type="button" id="coin_@item.CoinDenomination" class="btn btn-outline-secondary btnCoin" value="@item.CoinDenomination" disabled>@item.CoinDenomination</button>
+                        }
+
+                    }
+                </div>
+
+                <div class="form-group col-2 pl-0">
+                    <label for="SumCoins">Внесенная сумма:</label>
+                    <input type="text" id="SumCoins" class="form-control" value="" disabled />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="d-flex flex-wrap align-content-stretch justify-content-center">
+        @foreach (Drink item in Model.Drinks)
+        {
+            <div id="cardItem_@item.Id" class="card mb-3 mr-1 ml-1" style="width:250px">
+                <img class="card-img-top" src="@item.ImageUrl" alt="Card image">
+                <div class="card-body pt-2 pb-2 pr-1 pl-1">
+                    <h5 class="card-title mb-2">@item.Name</h5>
+                    <h6 class="card-text m-0">Объем - @item.Volume л</h6>
+                    <p class="card-text m-0">@item.Description</p>
+                </div>
+                <div class="d-flex justify-content-between align-content-center card-footer p-1">
+                    <p id="priceItem" class="card-text ml-2 mt-2 mb-0">Цена - <span>@item.Price</span></p>
+                    <button type="button" id="buyBtn" class="btn btn-success mr-2 buy" onclick="BuyItem(@item.Id)">Купить</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div id="res"></div>
+
+
+<script type="text/javascript">
+
+    //coinsv2
+    let coins2 = {
+        coins: [],
+        SumAllCoins() {
+            let result = 0;
+            this.coins.forEach(function (item, i, arr) {
+                result += item.Sum();
+            });
+            return result;
+        },
+        Clear() {
+            this.coins.forEach(function (item, i, arr) {
+                item.count = 0;
+            })
+        },
+    };
+    //----
+
+    let btnsCoin = document.querySelectorAll('.btnCoin');
+    let buyCards = document.querySelectorAll('.card');
+
+    switchBuyButtons();
+
+    btnsCoin.forEach(function (item, i, arr) {
+
+        let coin = {
+            name: 'coin_' + item.value,
+            denomination: item.value,
+            count: 0,
+            Sum() {
+                return this.count * this.denomination;
+            },
+        };
+
+        coins2.coins.push(coin);
+    });
+
+    coins2.coins.forEach(function (item, i, arr) {
+        btnsCoin.forEach(function (item2, i2, arr2) {
+            if (item.name === item2.id) {
+                item2.addEventListener('click', () => {
+                    item.count++;
+                    console.log('Сумма ' + item.denomination + ' = ' + item.Sum());
+                    console.log('Сумма всех монет = ' + coins2.SumAllCoins());
+                    sumCoins();
+                    switchBuyButtons();
+                });
+            };
+        })
+    })
+
+    function sumCoins() {
+        $('#SumCoins').val(coins2.SumAllCoins());
+    };
+
+    function switchBuyButtons() {
+        buyCards.forEach(function (item, i, arr) {
+
+            let price = item.querySelector('#priceItem').querySelector('span').innerHTML;
+            let buyBtn = item.querySelector('#buyBtn');
+
+            if (coins2.SumAllCoins() < price) {
+                buyBtn.disabled = true;
+            } else {
+                buyBtn.disabled = false;
+            }
+        });
+    };
+    function BuyItem(id) {
+        let model = {
+            Id: id,
+            Coins: [],
+            Sum: coins2.SumAllCoins(),
+        };
+
+        coins2.coins.forEach(function (item, i, arr) {
+            let coin = {
+                CoinDenomination: item.denomination,
+                Count: item.count,
+                Sum: item.Sum(),
+            };
+            model.Coins.push(coin);
+        });
+
+        $.post('@Url.Action("BuyItem", "Home")', {
+            Id: model.Id,
+            Coins: model.Coins,
+            Sum: model.Sum
+        }).done(function (data) {
+            coins2.Clear();
+            sumCoins();
+            switchBuyButtons();
+            $("#res").html(data);
+            $("#myModal").modal();
+        });
+    }
+</script>
